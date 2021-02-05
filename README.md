@@ -7,3 +7,4 @@
     ```
     "go.testEnvFile": "C:\\Go\\"
     ```
+* Also make sure to add Go to your environment variables 
