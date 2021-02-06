@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 	var position = 5
 	var sampleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries Random character"
 	alphabet := [...]string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
-	var size = len(alphabet)
+	var size = len(alphabet) // Also used in modulo calculcations
 	var cipher [len(alphabet)][2]string
 	var plainTextIndex = 0
 	var cipherTextIndex = 1
@@ -33,6 +34,8 @@ func main() {
 	fmt.Println(sampleText)
 	fmt.Println("Alphabet: ", alphabet)
 
+	fmt.Println(("\nCalculating cipher...\n"))
+
 	// Get the secret key translation
 	for index < size {
 		tempChar = alphabet[inOrderAlphabetIndex] // load the current alpha bet
@@ -46,22 +49,38 @@ func main() {
 			// so long as we are under the length of the string
 			// We are going to fill in the other column starting at
 			// the offset position defined by the user
-			cipher[offsetIndex][cipherTextIndex] = string(keyWord[index])
+			tempChar = string(keyWord[index])
+			cipher[offsetIndex][cipherTextIndex] = tempChar
 		} else {
 			// In this case we will continue filling in the rest of the
 			// cipher with the rest of the alphabet
 			// We will only insert the characters that were not in the
 			// the keyword
 
-			// TODO complete filling in the cipher column
+			// If the current letter is contained in the keyword string
+			// then skip this index
+			fmt.Println(offsetAlphabetIndex, index)
+			if strings.Contains(keyWord, alphabet[offsetAlphabetIndex]) {
+				offsetAlphabetIndex++
+			}
+
+			tempChar = alphabet[offsetAlphabetIndex]
+			cipher[offsetIndex][cipherTextIndex] = tempChar
+
+			// Incrememnt the offset alphabet if we are done with
+			// inserting the keyword
+			offsetAlphabetIndex++
 		}
 
-		offsetIndex++
 		index++
 		inOrderAlphabetIndex++
-		offsetAlphabetIndex++
+
+		// Stay within modulo ${size}
+		offsetIndex++
+		offsetIndex = offsetIndex % size
 	}
 
+	fmt.Println(cipher)
 	// TODO encrypt plaintext
 
 }
