@@ -17,7 +17,8 @@ func main() {
 	var cipherText = ""
 	alphabet := [...]string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 	var size = len(alphabet) // Also used in modulo calculcations
-	var cipher [len(alphabet)][2]string
+	var cipherArray [len(alphabet)][2]string
+	var key map[string]string
 	var plainTextIndex = 0
 	var cipherTextIndex = 1
 	var tempChar = ""
@@ -42,19 +43,19 @@ func main() {
 		tempChar = alphabet[inOrderAlphabetIndex] // load the current alpha bet
 
 		// Load Alphabet regularly
-		cipher[index][plainTextIndex] = tempChar
+		cipherArray[index][plainTextIndex] = tempChar
 
-		// Load the cipher text translation
+		// Load the cipherArray text translation
 		if index < lengthOfKeyWord {
 			// We can use the index variable to index the keyword string
 			// so long as we are under the length of the string
 			// We are going to fill in the other column starting at
 			// the offset position defined by the user
 			tempChar = string(keyWord[index])
-			cipher[offsetIndex][cipherTextIndex] = tempChar
+			cipherArray[offsetIndex][cipherTextIndex] = tempChar
 		} else {
 			// In this case we will continue filling in the rest of the
-			// cipher with the rest of the alphabet
+			// cipherArray with the rest of the alphabet
 			// We will only insert the characters that were not in the
 			// the keyword
 
@@ -65,7 +66,7 @@ func main() {
 			}
 
 			tempChar = alphabet[offsetAlphabetIndex]
-			cipher[offsetIndex][cipherTextIndex] = tempChar
+			cipherArray[offsetIndex][cipherTextIndex] = tempChar
 
 			// Incrememnt the offset alphabet if we are done with
 			// inserting the keyword
@@ -80,17 +81,36 @@ func main() {
 		offsetIndex = offsetIndex % size
 	}
 
-	fmt.Println("Key: ", cipher)
+	// Create a go map (dictionary)
+	size = len(cipherArray)
+	index = 0
+	key = make(map[string]string) // initialize map
+	for index < size {
+		key[cipherArray[index][plainTextIndex]] = cipherArray[index][cipherTextIndex]
+		index++
+	}
+
+	fmt.Println("Key: ", key)
 
 	fmt.Println(("\nEncrypting...\n"))
 
-	// TODO encrypt plaintext
 	size = len(plainText)
 	index = 0
 	tempChar = ""
+	// plainText = strings.ReplaceAll(plainText, " ", "") // Getting rid of white space is redundant here
 	for index < size {
 		tempChar = string(plainText[index]) // Get the current string
+
+		// In this case, I do not care for cases
+		// I just worry about encrypting the text
+		tempChar = strings.ToUpper(tempChar) // Convert to upper case
+
+		tempChar = key[tempChar] // encrypt
 		cipherText = cipherText + tempChar
+
 		index++
 	}
+
+	fmt.Println("Plain text: \n ", plainText)
+	fmt.Println("Cipher text: \n", cipherText)
 }
