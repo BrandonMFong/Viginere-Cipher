@@ -13,7 +13,8 @@ import (
 func main() {
 	var keyWord = "BIKE"
 	var position = 5
-	var sampleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries Random character"
+	var plainText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries Random character"
+	var cipherText = ""
 	alphabet := [...]string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 	var size = len(alphabet) // Also used in modulo calculcations
 	var cipher [len(alphabet)][2]string
@@ -29,12 +30,12 @@ func main() {
 	// Print out the variables
 	fmt.Println("Keyword: ", keyWord)
 	fmt.Println("Position: ", position)
-	fmt.Println("Length of sample text: ", len(sampleText))
+	fmt.Println("Length of sample text: ", len(plainText))
 	fmt.Println("Sample text: ")
-	fmt.Println(sampleText)
+	fmt.Println(plainText)
 	fmt.Println("Alphabet: ", alphabet)
 
-	fmt.Println(("\nCalculating cipher...\n"))
+	fmt.Println(("\nCalculating key...\n"))
 
 	// Get the secret key translation
 	for index < size {
@@ -59,7 +60,6 @@ func main() {
 
 			// If the current letter is contained in the keyword string
 			// then skip this index
-			fmt.Println(offsetAlphabetIndex, index)
 			if strings.Contains(keyWord, alphabet[offsetAlphabetIndex]) {
 				offsetAlphabetIndex++
 			}
@@ -80,7 +80,17 @@ func main() {
 		offsetIndex = offsetIndex % size
 	}
 
-	fmt.Println(cipher)
-	// TODO encrypt plaintext
+	fmt.Println("Key: ", cipher)
 
+	fmt.Println(("\nEncrypting...\n"))
+
+	// TODO encrypt plaintext
+	size = len(plainText)
+	index = 0
+	tempChar = ""
+	for index < size {
+		tempChar = string(plainText[index]) // Get the current string
+		cipherText = cipherText + tempChar
+		index++
+	}
 }
