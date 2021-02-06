@@ -11,12 +11,15 @@ import (
 )
 
 func main() {
+
+	// TODO make arguments
 	var keyWord = "BIKE"
 	var position = 5
+
 	var plainText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries Random character"
 	var cipherText = ""
 	alphabet := [...]string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
-	var size = len(alphabet) // Also used in modulo calculcations
+	var size = 0 // Also used in modulo calculcations
 	var cipherArray [len(alphabet)][2]string
 	var key map[string]string
 	var plainTextIndex = 0
@@ -27,6 +30,7 @@ func main() {
 	var offsetAlphabetIndex = 0
 	var offsetIndex = position
 	var lengthOfKeyWord = len(keyWord)
+	// var frequencyDistribution map[string]int // We are counting how many times the letter appears in cipher text
 
 	// Print out the variables
 	fmt.Println("Keyword: ", keyWord)
@@ -39,6 +43,8 @@ func main() {
 	fmt.Println(("\nCalculating key...\n"))
 
 	// Get the secret key translation
+	size = len(alphabet)
+	index = 0
 	for index < size {
 		tempChar = alphabet[inOrderAlphabetIndex] // load the current alpha bet
 
@@ -113,4 +119,12 @@ func main() {
 
 	fmt.Println("Plain text: \n ", plainText)
 	fmt.Println("Cipher text: \n", cipherText)
+
+	// TODO perform cyptanalysis
+	size = len(alphabet)
+	index = 0
+	for index < size {
+
+		index++
+	}
 }
