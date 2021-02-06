@@ -30,7 +30,7 @@ func main() {
 	var offsetAlphabetIndex = 0
 	var offsetIndex = position
 	var lengthOfKeyWord = len(keyWord)
-	// var frequencyDistribution map[string]int // We are counting how many times the letter appears in cipher text
+	var frequencyDistribution map[string]int // We are counting how many times the letter appears in cipher text
 
 	// Print out the variables
 	fmt.Println("Keyword: ", keyWord)
@@ -45,6 +45,7 @@ func main() {
 	// Get the secret key translation
 	size = len(alphabet)
 	index = 0
+	tempChar = ""
 	for index < size {
 		tempChar = alphabet[inOrderAlphabetIndex] // load the current alpha bet
 
@@ -120,11 +121,20 @@ func main() {
 	fmt.Println("Plain text: \n ", plainText)
 	fmt.Println("Cipher text: \n", cipherText)
 
-	// TODO perform cyptanalysis
+	// TODO perform cyptanalysis on ciphertext
 	size = len(alphabet)
 	index = 0
+	tempChar = ""
+	frequencyDistribution = make(map[string]int)
 	for index < size {
+		tempChar = alphabet[index]
 
+		frequencyDistribution[tempChar] = strings.Count(cipherText, tempChar) // Count how often the current letter appears in ciphertext
+
+		// The way I increment needs to correspond to the key length
+		// Let's start off with just indexing through the whole table
 		index++
 	}
+
+	fmt.Println("Frequency analysis:\n ", frequencyDistribution)
 }
