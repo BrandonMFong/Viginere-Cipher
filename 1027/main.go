@@ -5,6 +5,9 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"math"
 	"strings"
 	"sync"
 )
@@ -21,33 +24,89 @@ func main() {
 	var indexOfLetterE = strings.Index(alphabet, "E")
 	var stringCandidate string
 	var possibleKeys map[int]string
+	fileData, err := ioutil.ReadFile("cipher.txt")
+	var cipherText string
+	var indexCipher int
+	var indexKey int
+	var cipherSize int
+	var keySize int
+	var keyCandidate = "PADIO"
+	var plainText string
+	// var indexOfTheKeyLetter int
+
+	if err != nil {
+		log.Panicf("Failed to read file: %s", err)
+	}
+
+	// Read the file
+	cipherText = string(fileData)
+	cipherText = strings.ReplaceAll(cipherText, " ", "")
+	fmt.Println("Ciphertext:\n")
+	fmt.Println(cipherText, "\n")
 
 	fmt.Println("Based on English text, the following is mapping each ciphertext to the appropriate key letters with 'e'")
+	fmt.Println("Mappings: ")
 
+	// Calculate mapping
 	index = 0
 	size = len(popularLettersInText)
 	for index < size {
 		tempChar = string(popularLettersInText[index])
 		fmt.Print(tempChar, " => ")
 		tempIndex = strings.Index(alphabet, tempChar)
+
+		// Subtract mod26 with letter E
 		tempIndex -= indexOfLetterE
 		tempIndex = tempIndex % sizeOfAlphabet
+
 		fmt.Println(string(alphabet[tempIndex]))
-		stringCandidate += string(alphabet[tempIndex])
+		stringCandidate += string(alphabet[tempIndex]) // save into candidate string
+
 		index++
 	}
 
-	fmt.Println("String Candidate: ", stringCandidate)
+	fmt.Println("\nString Candidates: ")
 
 	index = 0
 	possibleKeys = make(map[int]string)
 	for str := range generate(stringCandidate) {
+
+		// Only take the strings that are key length 5
 		if len(str) == keyLength {
+			fmt.Println(str)
 			possibleKeys[index] = str
 			index++
 		}
 	}
-	fmt.Println(possibleKeys)
+
+	indexCipher = 0
+	indexKey = 0
+	cipherSize = len(cipherText)
+	keySize = len(keyCandidate)
+	tempChar = ""
+	for indexCipher < cipherSize {
+
+		// Get the index of the car
+		// tempChar = string(cipherText[indexCipher])
+		// tempChar = string(keyCandidate[indexKey])
+		// tempIndex = strings.Index(alphabet, tempChar)
+
+		// Get index of the current key letter
+		// decrypt
+		tempIndex = strings.Index(alphabet, string(cipherText[indexCipher])) - strings.Index(alphabet, string(keyCandidate[indexKey]))
+		tempIndex = int(math.Abs((float64(tempIndex))))
+
+		// apply mod26
+		tempIndex = tempIndex % sizeOfAlphabet
+
+		plainText += string(alphabet[tempIndex])
+
+		indexCipher++
+		indexKey++
+		indexKey %= keySize
+	}
+
+	fmt.Println(plainText)
 }
 
 func generate(alphabet string) <-chan string {
