@@ -5,10 +5,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"math"
+	"os"
 	"strings"
 	"sync"
 )
@@ -16,7 +18,7 @@ import (
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	// var keyLength = 5
-	var popularLettersInText = "EHSTMAQOPB"
+	var popularLettersInText = "EHSTMAQOPBNDHIX"
 	var size int
 	var index int
 	var tempChar string
@@ -34,11 +36,13 @@ func main() {
 	var keySize int
 	var keyCandidate string
 	var plainText string
-	var wordsText string
+	// var wordsText string
 	var indexPossibleKeys int
 	var possibleKeysSize int
 	var tempString string
 	var tempPrevString string
+	var wordsText []string
+	var tempInt int
 	// var indexOfTheKeyLetter int
 
 	// Read file for cipher text
@@ -53,11 +57,17 @@ func main() {
 	fmt.Println(cipherText, "\n ")
 
 	// Read file for words
-	fileData, err = ioutil.ReadFile("words.txt")
+	// fileData, err = ioutil.ReadFile("words.txt")
+	// if err != nil {
+	// 	log.Panicf("Failed to read file: %s", err)
+	// }
+	// wordsText = string(fileData)
+
+	wordsText, err = readLines("words.txt")
 	if err != nil {
-		log.Panicf("Failed to read file: %s", err)
+		log.Fatalf("readLines: %s", err)
 	}
-	wordsText = string(fileData)
+	fmt.Println(wordsText)
 
 	fmt.Println("Based on English text, the following is mapping each ciphertext to the appropriate key letters with 'e'")
 	fmt.Println("Mappings: ")
@@ -83,7 +93,7 @@ func main() {
 		index++
 	}
 
-	fmt.Println("\nString Candidates: ")
+	fmt.Println("\nCalculating string Candidates...\n ")
 
 	index = 0
 	possibleKeys = make(map[int]string)
@@ -91,11 +101,13 @@ func main() {
 		tempString = string(a)[0:5]
 		if tempPrevString != tempString {
 			possibleKeys[index] = tempString
-			fmt.Println(tempString)
+			// fmt.Println(tempString)
 			tempPrevString = tempString
 			index++
 		}
 	})
+
+	fmt.Println("\nRunning decryption... \n ")
 
 	indexPossibleKeys = 0
 	possibleKeysSize = len(possibleKeys)
@@ -103,39 +115,58 @@ func main() {
 
 		keyCandidate = possibleKeys[indexPossibleKeys]
 		tempString = strings.ToLower(keyCandidate)
-		if strings.Contains(wordsText, tempString) {
+		for i, word := range wordsText {
+			tempInt = i
+			if word == tempString {
 
-			fmt.Println("Testing ", keyCandidate, ": \n ")
+				fmt.Println("\n\nTesting ", keyCandidate, ": \n ")
 
-			// Decrypt the cipher text
-			indexCipher = 0
-			indexKey = 0
-			cipherSize = len(cipherText)
-			keySize = len(keyCandidate)
-			tempChar = ""
-			for indexCipher < cipherSize {
-				// Get index of the current key letter
-				// decrypt
-				tempIndex = strings.Index(alphabet, string(cipherText[indexCipher])) - strings.Index(alphabet, string(keyCandidate[indexKey]))
-				tempIndex = int(math.Abs((float64(tempIndex))))
+				// Decrypt the cipher text
+				indexCipher = 0
+				indexKey = 0
+				cipherSize = len(cipherText)
+				keySize = len(keyCandidate)
+				tempChar = ""
+				for indexCipher < cipherSize {
+					// Get index of the current key letter
+					// decrypt
+					tempIndex = strings.Index(alphabet, string(cipherText[indexCipher])) - strings.Index(alphabet, string(keyCandidate[indexKey]))
+					tempIndex = int(math.Abs((float64(tempIndex))))
 
-				// apply mod26
-				tempIndex = tempIndex % sizeOfAlphabet
+					// apply mod26
+					tempIndex = tempIndex % sizeOfAlphabet
 
-				plainText += string(alphabet[tempIndex])
+					plainText += string(alphabet[tempIndex])
 
-				indexCipher++
-				indexKey++
-				indexKey %= keySize
+					indexCipher++
+					indexKey++
+					indexKey %= keySize
+				}
+
+				fmt.Println(plainText)
+			} else {
+				// fmt.Println(keyCandidate, " is not in words text")
 			}
-
-			fmt.Println(plainText)
-		} else {
-			// fmt.Println(keyCandidate, " is not in words text")
 		}
 
 		indexPossibleKeys++
 	}
+	fmt.Print(tempInt)
+}
+
+func readLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
 }
 
 // Perm calls f with each permutation of a.
