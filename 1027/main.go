@@ -1,6 +1,7 @@
 // Brando
 // References:
 // https://stackoverflow.com/questions/19249588/go-programming-generating-combinations
+// https://yourbasic.org/golang/generate-permutation-slice-string/
 package main
 
 import (
@@ -14,8 +15,8 @@ import (
 
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	var keyLength = 5
-	var popularLettersInText = "EHSTM"
+	// var keyLength = 5
+	var popularLettersInText = "EHSTB"
 	var size int
 	var index int
 	var tempChar string
@@ -24,25 +25,38 @@ func main() {
 	var indexOfLetterE = strings.Index(alphabet, "E")
 	var stringCandidate string
 	var possibleKeys map[int]string
-	fileData, err := ioutil.ReadFile("cipher.txt")
+	// fileData, err := ioutil.ReadFile("cipher.txt")
+	var fileData []byte
+	var err error
 	var cipherText string
 	var indexCipher int
 	var indexKey int
 	var cipherSize int
 	var keySize int
-	var keyCandidate = "PADIO"
+	var keyCandidate string
 	var plainText string
+	var wordsText string
+	var indexPossibleKeys int
+	var possibleKeysSize int
 	// var indexOfTheKeyLetter int
 
+	// Read file for cipher text
+	fileData, err = ioutil.ReadFile("cipher.txt")
 	if err != nil {
 		log.Panicf("Failed to read file: %s", err)
 	}
 
-	// Read the file
 	cipherText = string(fileData)
 	cipherText = strings.ReplaceAll(cipherText, " ", "")
-	fmt.Println("Ciphertext:\n")
-	fmt.Println(cipherText, "\n")
+	fmt.Println("Ciphertext:\n ")
+	fmt.Println(cipherText, "\n ")
+
+	// Read file for words
+	fileData, err = ioutil.ReadFile("words.txt")
+	if err != nil {
+		log.Panicf("Failed to read file: %s", err)
+	}
+	wordsText = string(fileData)
 
 	fmt.Println("Based on English text, the following is mapping each ciphertext to the appropriate key letters with 'e'")
 	fmt.Println("Mappings: ")
@@ -58,6 +72,9 @@ func main() {
 		// Subtract mod26 with letter E
 		tempIndex -= indexOfLetterE
 		tempIndex = tempIndex % sizeOfAlphabet
+		if tempIndex < 0 {
+			tempIndex = tempIndex + sizeOfAlphabet
+		}
 
 		fmt.Println(string(alphabet[tempIndex]))
 		stringCandidate += string(alphabet[tempIndex]) // save into candidate string
@@ -69,44 +86,75 @@ func main() {
 
 	index = 0
 	possibleKeys = make(map[int]string)
-	for str := range generate(stringCandidate) {
+	Perm([]rune(stringCandidate), func(a []rune) {
+		// fmt.Println(string(a))
+		possibleKeys[index] = string(a)
+		index++
+	})
 
-		// Only take the strings that are key length 5
-		if len(str) == keyLength {
-			fmt.Println(str)
-			possibleKeys[index] = str
-			index++
+	indexPossibleKeys = 0
+	possibleKeysSize = len(possibleKeys)
+	for indexPossibleKeys < possibleKeysSize {
+
+		keyCandidate = possibleKeys[indexPossibleKeys]
+		if strings.Contains(wordsText, keyCandidate) {
+
+			fmt.Println("Testing ", keyCandidate, ": \n ")
+
+			// Decrypt the cipher text
+			indexCipher = 0
+			indexKey = 0
+			cipherSize = len(cipherText)
+			keySize = len(keyCandidate)
+			tempChar = ""
+			for indexCipher < cipherSize {
+
+				// Get the index of the car
+				// tempChar = string(cipherText[indexCipher])
+				// tempChar = string(keyCandidate[indexKey])
+				// tempIndex = strings.Index(alphabet, tempChar)
+
+				// Get index of the current key letter
+				// decrypt
+				tempIndex = strings.Index(alphabet, string(cipherText[indexCipher])) - strings.Index(alphabet, string(keyCandidate[indexKey]))
+				tempIndex = int(math.Abs((float64(tempIndex))))
+
+				// apply mod26
+				tempIndex = tempIndex % sizeOfAlphabet
+
+				plainText += string(alphabet[tempIndex])
+
+				indexCipher++
+				indexKey++
+				indexKey %= keySize
+			}
+
+			fmt.Println(plainText)
+		} else {
+			fmt.Println(keyCandidate, " is not in words text")
 		}
+
+		indexPossibleKeys++
 	}
+}
 
-	indexCipher = 0
-	indexKey = 0
-	cipherSize = len(cipherText)
-	keySize = len(keyCandidate)
-	tempChar = ""
-	for indexCipher < cipherSize {
+// Perm calls f with each permutation of a.
+func Perm(a []rune, f func([]rune)) {
+	perm(a, f, 0)
+}
 
-		// Get the index of the car
-		// tempChar = string(cipherText[indexCipher])
-		// tempChar = string(keyCandidate[indexKey])
-		// tempIndex = strings.Index(alphabet, tempChar)
-
-		// Get index of the current key letter
-		// decrypt
-		tempIndex = strings.Index(alphabet, string(cipherText[indexCipher])) - strings.Index(alphabet, string(keyCandidate[indexKey]))
-		tempIndex = int(math.Abs((float64(tempIndex))))
-
-		// apply mod26
-		tempIndex = tempIndex % sizeOfAlphabet
-
-		plainText += string(alphabet[tempIndex])
-
-		indexCipher++
-		indexKey++
-		indexKey %= keySize
+// Permute the values at index i to len(a)-1.
+func perm(a []rune, f func([]rune), i int) {
+	if i > len(a) {
+		f(a)
+		return
 	}
-
-	fmt.Println(plainText)
+	perm(a, f, i+1)
+	for j := i + 1; j < len(a); j++ {
+		a[i], a[j] = a[j], a[i]
+		perm(a, f, i+1)
+		a[i], a[j] = a[j], a[i]
+	}
 }
 
 func generate(alphabet string) <-chan string {
