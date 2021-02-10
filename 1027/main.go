@@ -16,7 +16,7 @@ import (
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	// var keyLength = 5
-	var popularLettersInText = "EHSTB"
+	var popularLettersInText = "EHSTMAQOPB"
 	var size int
 	var index int
 	var tempChar string
@@ -25,7 +25,6 @@ func main() {
 	var indexOfLetterE = strings.Index(alphabet, "E")
 	var stringCandidate string
 	var possibleKeys map[int]string
-	// fileData, err := ioutil.ReadFile("cipher.txt")
 	var fileData []byte
 	var err error
 	var cipherText string
@@ -38,6 +37,8 @@ func main() {
 	var wordsText string
 	var indexPossibleKeys int
 	var possibleKeysSize int
+	var tempString string
+	var tempPrevString string
 	// var indexOfTheKeyLetter int
 
 	// Read file for cipher text
@@ -87,9 +88,13 @@ func main() {
 	index = 0
 	possibleKeys = make(map[int]string)
 	Perm([]rune(stringCandidate), func(a []rune) {
-		// fmt.Println(string(a))
-		possibleKeys[index] = string(a)
-		index++
+		tempString = string(a)[0:5]
+		if tempPrevString != tempString {
+			possibleKeys[index] = tempString
+			fmt.Println(tempString)
+			tempPrevString = tempString
+			index++
+		}
 	})
 
 	indexPossibleKeys = 0
@@ -97,7 +102,8 @@ func main() {
 	for indexPossibleKeys < possibleKeysSize {
 
 		keyCandidate = possibleKeys[indexPossibleKeys]
-		if strings.Contains(wordsText, keyCandidate) {
+		tempString = strings.ToLower(keyCandidate)
+		if strings.Contains(wordsText, tempString) {
 
 			fmt.Println("Testing ", keyCandidate, ": \n ")
 
@@ -108,12 +114,6 @@ func main() {
 			keySize = len(keyCandidate)
 			tempChar = ""
 			for indexCipher < cipherSize {
-
-				// Get the index of the car
-				// tempChar = string(cipherText[indexCipher])
-				// tempChar = string(keyCandidate[indexKey])
-				// tempIndex = strings.Index(alphabet, tempChar)
-
 				// Get index of the current key letter
 				// decrypt
 				tempIndex = strings.Index(alphabet, string(cipherText[indexCipher])) - strings.Index(alphabet, string(keyCandidate[indexKey]))
@@ -131,7 +131,7 @@ func main() {
 
 			fmt.Println(plainText)
 		} else {
-			fmt.Println(keyCandidate, " is not in words text")
+			// fmt.Println(keyCandidate, " is not in words text")
 		}
 
 		indexPossibleKeys++
