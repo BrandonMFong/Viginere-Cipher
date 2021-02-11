@@ -15,11 +15,15 @@ import (
 
 func main() {
 
-	// TODO make arguments
-	var keyWord = os.Args[1]
+	var ArgC = len(os.Args)
+	if ArgC != 3 {
+		// handle error
+		fmt.Println("Please pass: Arg1=KeyWord & Arg2=Position")
+		os.Exit(2)
+	}
+
+	var keyWord = strings.ToUpper(os.Args[1])
 	var position = os.Args[2]
-	// var keyWord = "BIKE"
-	// var position = 5
 
 	var plainText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries Random character"
 	var cipherText = ""
@@ -43,6 +47,7 @@ func main() {
 	var garbage int
 	var err error
 
+	// Convert from string to int
 	offsetIndex, err = strconv.Atoi(position)
 	if err != nil {
 		// handle error
@@ -124,7 +129,6 @@ func main() {
 	size = len(plainText)
 	index = 0
 	tempChar = ""
-	// plainText = strings.ReplaceAll(plainText, " ", "") // Getting rid of white space is redundant here
 	for index < size {
 		tempChar = string(plainText[index]) // Get the current string
 
@@ -140,7 +144,6 @@ func main() {
 
 	fmt.Println("Cipher text: \n", cipherText)
 
-	// TODO perform cyptanalysis on ciphertext
 	size = len(keyWord) // offset
 	index = 0           // defines starting point for offest
 	for index < size {
@@ -173,7 +176,7 @@ func main() {
 		// Show the frequency analysis of the cipher text in the respective offset
 		fmt.Println("\nFrequency analysis for offset", index, ":")
 		for i, index := range rankMapStringInt(frequencyDistribution) {
-			fmt.Printf("[%s -> %d]\n", index, frequencyDistribution[index])
+			fmt.Printf("[%s : %d]\n", index, frequencyDistribution[index])
 			garbage = i
 		}
 		fmt.Println()
