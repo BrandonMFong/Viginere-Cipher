@@ -12,6 +12,7 @@ action
 activity
 actually
 add
+adopt
 address
 administration
 admit

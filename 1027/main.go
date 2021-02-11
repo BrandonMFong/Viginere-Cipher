@@ -2,6 +2,10 @@
 // References:
 // https://stackoverflow.com/questions/19249588/go-programming-generating-combinations
 // https://yourbasic.org/golang/generate-permutation-slice-string/
+/*
+	Possible words:
+		ADOPT
+*/
 package main
 
 import (
@@ -9,7 +13,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math"
 	"os"
 	"strings"
 	"sync"
@@ -17,8 +20,9 @@ import (
 
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	// var keyLength = 5
-	var popularLettersInText = "EHSTMAQOPBNDHIX"
+	var keyLength = 5
+	// var popularLettersInText = "EHSTMAQOPBNDHIX"
+	var popularLettersInText = "EHSTDHIX"
 	var size int
 	var index int
 	var tempChar string
@@ -36,14 +40,15 @@ func main() {
 	var keySize int
 	var keyCandidate string
 	var plainText string
-	// var wordsText string
+	var plainTextArray []string
 	var indexPossibleKeys int
 	var possibleKeysSize int
 	var tempString string
-	var tempPrevString string
 	var wordsText []string
-	var tempInt int
-	// var indexOfTheKeyLetter int
+	var xIndex int
+	var yIndex int
+	var plainTextArrayIndex int
+	var dontInsert bool
 
 	// Read file for cipher text
 	fileData, err = ioutil.ReadFile("cipher.txt")
@@ -57,20 +62,13 @@ func main() {
 	fmt.Println(cipherText, "\n ")
 
 	// Read file for words
-	// fileData, err = ioutil.ReadFile("words.txt")
-	// if err != nil {
-	// 	log.Panicf("Failed to read file: %s", err)
-	// }
-	// wordsText = string(fileData)
-
 	wordsText, err = readLines("words.txt")
 	if err != nil {
 		log.Fatalf("readLines: %s", err)
 	}
-	fmt.Println(wordsText)
 
-	fmt.Println("Based on English text, the following is mapping each ciphertext to the appropriate key letters with 'e'")
-	fmt.Println("Mappings: ")
+	fmt.Println("\n\nBased on English text, the following is mapping each ciphertext to the appropriate key letters with 'e'")
+	fmt.Println("Mappings (this fulfills 10.2.7c): ")
 
 	// Calculate mapping
 	index = 0
@@ -92,17 +90,33 @@ func main() {
 
 		index++
 	}
+	fmt.Println("Final: ", stringCandidate)
 
 	fmt.Println("\nCalculating string Candidates...\n ")
 
 	index = 0
 	possibleKeys = make(map[int]string)
+	tempIndex = 0
+	dontInsert = false
 	Perm([]rune(stringCandidate), func(a []rune) {
-		tempString = string(a)[0:5]
-		if tempPrevString != tempString {
+		tempString = string(a)[0:keyLength]
+
+		// Test if we already have this word
+		tempIndex = 0
+		size = len(possibleKeys)
+		dontInsert = false
+		for tempIndex < size {
+			if tempString == possibleKeys[tempIndex] {
+				dontInsert = true
+				break
+			}
+			tempIndex++
+		}
+
+		// If not, then include as possible keys
+		if !dontInsert {
 			possibleKeys[index] = tempString
 			// fmt.Println(tempString)
-			tempPrevString = tempString
 			index++
 		}
 	})
@@ -111,15 +125,14 @@ func main() {
 
 	indexPossibleKeys = 0
 	possibleKeysSize = len(possibleKeys)
+	plainTextArrayIndex = 0
 	for indexPossibleKeys < possibleKeysSize {
 
 		keyCandidate = possibleKeys[indexPossibleKeys]
 		tempString = strings.ToLower(keyCandidate)
 		for i, word := range wordsText {
-			tempInt = i
 			if word == tempString {
-
-				fmt.Println("\n\nTesting ", keyCandidate, ": \n ")
+				fmt.Println("Decrypting '", word, "' in line ", i)
 
 				// Decrypt the cipher text
 				indexCipher = 0
@@ -127,14 +140,19 @@ func main() {
 				cipherSize = len(cipherText)
 				keySize = len(keyCandidate)
 				tempChar = ""
+				plainText = ""
 				for indexCipher < cipherSize {
 					// Get index of the current key letter
 					// decrypt
-					tempIndex = strings.Index(alphabet, string(cipherText[indexCipher])) - strings.Index(alphabet, string(keyCandidate[indexKey]))
-					tempIndex = int(math.Abs((float64(tempIndex))))
+					xIndex = strings.Index(alphabet, string(cipherText[indexCipher]))
+					yIndex = strings.Index(alphabet, string(keyCandidate[indexKey]))
+					tempIndex = xIndex - yIndex
 
 					// apply mod26
 					tempIndex = tempIndex % sizeOfAlphabet
+					if tempIndex < 0 {
+						tempIndex = tempIndex + sizeOfAlphabet
+					}
 
 					plainText += string(alphabet[tempIndex])
 
@@ -142,8 +160,9 @@ func main() {
 					indexKey++
 					indexKey %= keySize
 				}
-
-				fmt.Println(plainText)
+				plainText = "[" + keyCandidate + "] " + plainText
+				plainTextArray = append(plainTextArray, plainText)
+				plainTextArrayIndex++
 			} else {
 				// fmt.Println(keyCandidate, " is not in words text")
 			}
@@ -151,7 +170,11 @@ func main() {
 
 		indexPossibleKeys++
 	}
-	fmt.Print(tempInt)
+
+	fmt.Println()
+	for i, text := range plainTextArray {
+		fmt.Println(i, ": ", text, "\n ")
+	}
 }
 
 func readLines(path string) ([]string, error) {
