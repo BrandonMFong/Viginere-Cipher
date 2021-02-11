@@ -8,3 +8,12 @@
     "go.testEnvFile": "C:\\Go\\"
     ```
 * Also make sure to add Go to your environment variables 
+
+## How to build Golang code 
+```
+go build <Go File>
+```
+
+## 1026 - Substitution Cipher
+
+## 1027 - Vigenere Cipher
