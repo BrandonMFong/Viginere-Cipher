@@ -7,6 +7,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -31,8 +32,14 @@ func main() {
 	var offsetIndex = position
 	var lengthOfKeyWord = len(keyWord)
 	var frequencyDistribution map[string]int // We are counting how many times the letter appears in cipher text
+	var tempSize int
+	var tempIndex int
+	var tempCipherText string
+	var cipherTextArray []string
+	var garbage int
 
 	// Print out the variables
+	fmt.Println("PROGRAM VARIABLES: ")
 	fmt.Println("Keyword: ", keyWord)
 	fmt.Println("Position: ", position)
 	fmt.Println("Length of sample text: ", len(plainText))
@@ -40,7 +47,7 @@ func main() {
 	fmt.Println(plainText)
 	fmt.Println("Alphabet: ", alphabet)
 
-	fmt.Println(("\nCalculating key...\n"))
+	fmt.Println(("\nCalculating key map...\n"))
 
 	// Get the secret key translation
 	size = len(alphabet)
@@ -97,8 +104,9 @@ func main() {
 		index++
 	}
 
-	fmt.Println("Key: ", key)
+	fmt.Println("Key: ", key) // Show key
 
+	// Encrypt plain text
 	fmt.Println(("\nEncrypting...\n"))
 
 	size = len(plainText)
@@ -118,23 +126,68 @@ func main() {
 		index++
 	}
 
-	fmt.Println("Plain text: \n ", plainText)
 	fmt.Println("Cipher text: \n", cipherText)
 
 	// TODO perform cyptanalysis on ciphertext
-	size = len(alphabet)
-	index = 0
-	tempChar = ""
-	frequencyDistribution = make(map[string]int)
+	size = len(keyWord) // offset
+	index = 0           // defines starting point for offest
 	for index < size {
-		tempChar = alphabet[index]
 
-		frequencyDistribution[tempChar] = strings.Count(cipherText, tempChar) // Count how often the current letter appears in ciphertext
+		// Go through each letter of the alphabet and count how many times it occurs in cipher text
+		tempSize = len(alphabet)
+		tempIndex = 0
+		tempChar = ""
+		frequencyDistribution = make(map[string]int)
+		for tempIndex < tempSize {
 
-		// The way I increment needs to correspond to the key length
-		// Let's start off with just indexing through the whole table
+			// Get only the offset characters
+			// start index offset is defined by 'index' var
+			// and the offset increments are defined by size
+			cipherTextArray = strings.Split(cipherText, "")
+			var result []string // init empty slice
+			for i := index; i < len(cipherTextArray); i = i + size {
+				result = append(result, cipherTextArray[i])
+			}
+			tempCipherText = strings.Join(result, "")
+
+			tempChar = alphabet[tempIndex]
+			frequencyDistribution[tempChar] = strings.Count(tempCipherText, tempChar) // Count how often the current letter appears in ciphertext
+
+			// The way I increment needs to correspond to the key length
+			// Let's start off with just indexing through the whole table
+			tempIndex++
+		}
+
+		// Show the frequency analysis of the cipher text in the respective offset
+		fmt.Println("\nFrequency analysis for offset", index, ":")
+		for i, index := range rankMapStringInt(frequencyDistribution) {
+			fmt.Printf("[%s -> %d]\n", index, frequencyDistribution[index])
+			garbage = i
+		}
+		fmt.Println()
+
 		index++
 	}
 
-	fmt.Println("Frequency analysis:\n ", frequencyDistribution)
+	fmt.Println(garbage) // garbage variable
+}
+
+// Credits to: https://stackoverflow.com/a/60513740/12135693
+func rankMapStringInt(values map[string]int) []string {
+	type kv struct {
+		Key   string
+		Value int
+	}
+	var ss []kv
+	for k, v := range values {
+		ss = append(ss, kv{k, v})
+	}
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value > ss[j].Value
+	})
+	ranked := make([]string, len(values))
+	for i, kv := range ss {
+		ranked[i] = kv.Key
+	}
+	return ranked
 }
