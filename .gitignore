@@ -1,2 +1,5 @@
 # Visual Code
 .vscode
+
+# Binary
+*.exe

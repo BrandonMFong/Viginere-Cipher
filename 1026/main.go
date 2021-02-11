@@ -7,15 +7,19 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
+	"strconv"
 	"strings"
 )
 
 func main() {
 
 	// TODO make arguments
-	var keyWord = "BIKE"
-	var position = 5
+	var keyWord = os.Args[1]
+	var position = os.Args[2]
+	// var keyWord = "BIKE"
+	// var position = 5
 
 	var plainText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries Random character"
 	var cipherText = ""
@@ -29,7 +33,7 @@ func main() {
 	var index = 0
 	var inOrderAlphabetIndex = 0
 	var offsetAlphabetIndex = 0
-	var offsetIndex = position
+	var offsetIndex int
 	var lengthOfKeyWord = len(keyWord)
 	var frequencyDistribution map[string]int // We are counting how many times the letter appears in cipher text
 	var tempSize int
@@ -37,6 +41,14 @@ func main() {
 	var tempCipherText string
 	var cipherTextArray []string
 	var garbage int
+	var err error
+
+	offsetIndex, err = strconv.Atoi(position)
+	if err != nil {
+		// handle error
+		fmt.Println(err)
+		os.Exit(2)
+	}
 
 	// Print out the variables
 	fmt.Println("PROGRAM VARIABLES: ")
