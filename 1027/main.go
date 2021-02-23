@@ -181,7 +181,7 @@ func main() {
 
 func getPopularLettersInText(cipherText string, keyLength int) string {
 	// var length uint = 4
-	var columns uint = 2
+	var columns uint = 1
 	var result string
 	var size uint
 	var index uint
@@ -190,11 +190,21 @@ func getPopularLettersInText(cipherText string, keyLength int) string {
 	var tempChar string
 	var frequencyDistribution map[string]int
 	var cipherTextArray []string
-	var tempCipherText string
+	var tempCipherText string // Contains ciphertext at offset
+	var temp []string         // init empty slice
 
 	size = uint(keyLength) // offset
 	index = 0              // defines starting point for offest
 	for index < size {
+
+		// Get only the offset characters
+		// start index offset is defined by 'index' var
+		// and the offset increments are defined by size
+		cipherTextArray = strings.Split(cipherText, "")
+		for i := index; i < uint(len(cipherTextArray)); i = i + size {
+			temp = append(temp, cipherTextArray[i])
+		}
+		tempCipherText = strings.Join(temp, "")
 
 		// Go through each letter of the alphabet and count how many times it occurs in cipher text
 		tempSize = uint(len(alphabet))
@@ -202,16 +212,6 @@ func getPopularLettersInText(cipherText string, keyLength int) string {
 		tempChar = ""
 		frequencyDistribution = make(map[string]int)
 		for tempIndex < tempSize {
-
-			// Get only the offset characters
-			// start index offset is defined by 'index' var
-			// and the offset increments are defined by size
-			cipherTextArray = strings.Split(cipherText, "")
-			var result []string // init empty slice
-			for i := index; i < uint(len(cipherTextArray)); i = i + size {
-				result = append(result, cipherTextArray[i])
-			}
-			tempCipherText = strings.Join(result, "")
 
 			tempChar = alphabet[tempIndex]
 			frequencyDistribution[tempChar] = strings.Count(tempCipherText, tempChar) // Count how often the current letter appears in ciphertext
