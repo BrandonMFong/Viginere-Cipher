@@ -14,8 +14,11 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
+
+var alphabet = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -49,7 +52,7 @@ func main() {
 	var dontInsert bool
 
 	// Read file for cipher text
-	fileData, err = ioutil.ReadFile("cipher.txt")
+	fileData, err = ioutil.ReadFile("cipher2.txt")
 	if err != nil {
 		log.Panicf("Failed to read file: %s", err)
 	}
@@ -67,6 +70,8 @@ func main() {
 
 	fmt.Println("\n\nBased on English text, the following is mapping each ciphertext to the appropriate key letters with 'e'")
 	fmt.Println("Mappings (this fulfills 10.2.7c): ")
+
+	popularLettersInText = getPopularLettersInText(cipherText, keyLength)
 
 	// Calculate mapping
 	index = 0
@@ -172,6 +177,85 @@ func main() {
 	for i, text := range plainTextArray {
 		fmt.Println(i, ": ", text, "\n ")
 	}
+}
+
+func getPopularLettersInText(cipherText string, keyLength int) string {
+	// var length uint = 4
+	var columns uint = 2
+	var result string
+	var size uint
+	var index uint
+	var tempSize uint
+	var tempIndex uint
+	var tempChar string
+	var frequencyDistribution map[string]int
+	var cipherTextArray []string
+	var tempCipherText string
+
+	size = uint(keyLength) // offset
+	index = 0              // defines starting point for offest
+	for index < size {
+
+		// Go through each letter of the alphabet and count how many times it occurs in cipher text
+		tempSize = uint(len(alphabet))
+		tempIndex = 0
+		tempChar = ""
+		frequencyDistribution = make(map[string]int)
+		for tempIndex < tempSize {
+
+			// Get only the offset characters
+			// start index offset is defined by 'index' var
+			// and the offset increments are defined by size
+			cipherTextArray = strings.Split(cipherText, "")
+			var result []string // init empty slice
+			for i := index; i < uint(len(cipherTextArray)); i = i + size {
+				result = append(result, cipherTextArray[i])
+			}
+			tempCipherText = strings.Join(result, "")
+
+			tempChar = alphabet[tempIndex]
+			frequencyDistribution[tempChar] = strings.Count(tempCipherText, tempChar) // Count how often the current letter appears in ciphertext
+
+			// The way I increment needs to correspond to the key length
+			// Let's start off with just indexing through the whole table
+			tempIndex++
+		}
+
+		// Get the popular text into a string
+		tempIndex = 0
+		for _, index := range rankMapStringInt(frequencyDistribution) {
+			if tempIndex < columns {
+				result = result + index
+			} else {
+				break
+			}
+			tempIndex++
+			// break // just get one
+		}
+		index++
+	}
+
+	return result
+}
+
+// Credits to: https://stackoverflow.com/a/60513740/12135693
+func rankMapStringInt(values map[string]int) []string {
+	type kv struct {
+		Key   string
+		Value int
+	}
+	var ss []kv
+	for k, v := range values {
+		ss = append(ss, kv{k, v})
+	}
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value > ss[j].Value
+	})
+	ranked := make([]string, len(values))
+	for i, kv := range ss {
+		ranked[i] = kv.Key
+	}
+	return ranked
 }
 
 func readLines(path string) ([]string, error) {
