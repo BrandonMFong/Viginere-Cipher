@@ -20,6 +20,8 @@ import (
 
 var alphabet = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 
+const columnsToConsider uint = 1
+
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	var keyLength = 5
@@ -182,7 +184,7 @@ func main() {
 
 func getPopularLettersInText(cipherText string, keyLength int) string {
 	// var length uint = 4
-	var columns uint = 1
+	var columns uint = columnsToConsider
 	var result string
 	var size uint
 	var index uint
