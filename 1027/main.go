@@ -23,7 +23,8 @@ var alphabet = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	var keyLength = 5
-	var popularLettersInText = "EHSTDHIX"
+	var popularLettersInText string
+	// var popularLettersInText = "EHSTDHIX"
 	var size int
 	var index int
 	var tempChar string
