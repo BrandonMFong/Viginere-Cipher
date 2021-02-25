@@ -197,6 +197,7 @@ func getPopularLettersInText(cipherText string, keyLength int) string {
 	size = uint(keyLength) // offset
 	index = 0              // defines starting point for offest
 	for index < size {
+		temp = temp[:0] // Clear array
 
 		// Get only the offset characters
 		// start index offset is defined by 'index' var
