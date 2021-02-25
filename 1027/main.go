@@ -24,7 +24,7 @@ const columnsToConsider uint = 1
 
 func main() {
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	var keyLength = 5
+	var keyLength = 6
 	var popularLettersInText string
 	// var popularLettersInText = "EHSTDHIX"
 	var size int
@@ -55,7 +55,7 @@ func main() {
 	var dontInsert bool
 
 	// Read file for cipher text
-	fileData, err = ioutil.ReadFile("cipher2.txt")
+	fileData, err = ioutil.ReadFile("cipher3.txt")
 	if err != nil {
 		log.Panicf("Failed to read file: %s", err)
 	}
